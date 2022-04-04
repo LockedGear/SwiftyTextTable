@@ -2,21 +2,21 @@
 
 A lightweight Swift library for generating text tables.
 
-[![Build Status](https://travis-ci.org/scottrhoyt/SwiftyTextTable.svg?branch=master)](https://travis-ci.org/scottrhoyt/SwiftyTextTable)
-[![codecov.io](https://codecov.io/github/scottrhoyt/SwiftyTextTable/coverage.svg?branch=master)](https://codecov.io/github/scottrhoyt/SwiftyTextTable?branch=master)
+[![Build Status](https://travis-ci.org/LockedGear/SwiftyTextTable.svg?branch=master)](https://travis-ci.org/LockedGear/SwiftyTextTable)
+[![codecov.io](https://codecov.io/github/LockedGear/SwiftyTextTable/coverage.svg?branch=master)](https://codecov.io/github/LockedGear/SwiftyTextTable?branch=master)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg)](https://github.com/apple/swift-package-manager)
-[![CocoaPods](https://img.shields.io/cocoapods/v/SwiftyTextTable.svg)]()
 ![Platform OS X + Linux](https://img.shields.io/badge/Platform-OS%20X%20%2B%20Linux-blue.svg)
-[![Language Swift 4.0](https://img.shields.io/badge/Language-Swift%204.0-orange.svg)](https://swift.org)
+[![Language Swift 5.0](https://img.shields.io/badge/Language-Swift%205.0-orange.svg)](https://swift.org)
 
-![Example](http://i.imgur.com/utoa6TK.png)
+![Example](https://i.imgur.com/I3UleXF.png)
 
 ## Swift Language Support
 
-SwiftyTextTable is now Swift 4.0 compatible! The last release to support Swift
-3.1 was [0.7.1](https://github.com/scottrhoyt/SwiftyTextTable/releases/tag/0.7.1).
-The last release to support Swift 2.3 was [0.3.1](https://github.com/scottrhoyt/SwiftyTextTable/releases/tag/0.3.1).
+SwiftyTextTable is now Swift 5.0 compatible! The last release to support Swift
+4.0 was [0.9.1](https://github.com/LockedGear/SwiftyTextTable/releases/tag/0.9.1).
+3.1 was [0.7.1](https://github.com/LockedGear/SwiftyTextTable/releases/tag/0.7.1).
+The last release to support Swift 2.3 was [0.3.1](https://github.com/LockedGear/SwiftyTextTable/releases/tag/0.3.1).
 
 ## Installation
 
@@ -25,7 +25,7 @@ You can use [Carthage](https://github.com/Carthage/Carthage) to install
 SwiftyTextTable by adding it to your `Cartfile`:
 
 ```
-github "scottrhoyt/SwiftyTextTable"
+github "LockedGear/SwiftyTextTable"
 ```
 
 ### Swift Package Manager (OS X + Linux)
@@ -39,18 +39,9 @@ import PackageDescription
 let package = Package(
     name: "<YOUR_PROJECT_NAME>",
     dependencies: [
-        .package(url: "https://github.com/scottrhoyt/SwiftyTextTable.git", from: "0.5.0")
+        .package(url: "https://github.com/LockedGear/SwiftyTextTable.git", from: "0.9.5")
     ]
 )
-```
-
-### CocoaPods (OS X)
-
-You can use [CocoaPods](https://cocoapods.org) to install SwiftyTextTable by
-adding it to your `Podfile`:
-
-```ruby
-pod 'SwiftyTextTable'
 ```
 
 ### Manual
@@ -201,10 +192,11 @@ when there are fewer `values` than columns. `TextTable` will also disregard all
 
 ```swift
 let foo = TextTableColumn(header: "foo")
-let bar = TextTableColumn(header: "bar")
+let bar = TextTableColumn(header: "bar",color: .blue) //with color
 let baz = TextTableColumn(header: "baz")
 
 var table = TextTable(columns: [foo, bar, baz])
+//var table = TextTable(columns: [foo, bar, baz], style:.none) // with style
 
 table.addRow([1, 2])
 table.addRow([11, 22, 33])
@@ -222,6 +214,15 @@ print(tableString)
 | 111 | 222 | 333 |
 +-----+-----+-----+
 */
+
+/*
+                  
+  foo   bar   baz  
+                   
+  1     2          
+  11    22    33   
+  111   222   333 
+ */
 ```
 
 ### Console Formatting Support
@@ -236,4 +237,4 @@ Check out the full API reference [here](http://scottrhoyt.github.io/SwiftyTextTa
 
 ## License
 
-SwiftyTextTable is released under the [MIT License](https://github.com/scottrhoyt/SwiftyTextTable/blob/master/LICENSE).
+SwiftyTextTable is released under the [MIT License](https://github.com/LockedGear/SwiftyTextTable/blob/master/LICENSE).
