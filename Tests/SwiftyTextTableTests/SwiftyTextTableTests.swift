@@ -4,23 +4,57 @@
 //
 //  Created by Scott Hoyt on 2/3/16.
 //  Copyright © 2016 Scott Hoyt. All rights reserved.
-//
+//  Modified by ryh on 04/2022
 
 import XCTest
 import SwiftyTextTable
 
 class SwiftyTextTableTests: XCTestCase {
 
-    func fooTable() -> TextTable {
+  func fooTable(style:TextTableStyle = .default) -> TextTable {
         let foo = TextTableColumn(header: "foo")
         let bar = TextTableColumn(header: "bar")
         let baz = TextTableColumn(header: "baz")
-        var table = TextTable(columns: [foo, bar, baz])
+        var table = TextTable(columns: [foo, bar, baz],style: style)
         table.addRow(values: ["1", "2"])
         table.addRow(values: [11, 22, 33])
         table.addRow(values: [111, 222, 333, 444])
         return table
     }
+
+  func fooColorTable() -> TextTable {
+    let foo = TextTableColumn(header: "foo",color: .red)
+    let bar = TextTableColumn(header: "bar",color: .blue)
+      var table = TextTable(columns: [foo, bar])
+    table.addRow(values: ["1", 2])
+      return table
+  }
+  func testRenderColor() {
+    let output = fooColorTable().render()
+    print(output)
+    let odata=output.data(using: String.Encoding.utf8)
+    //since we cannot compare Unprintable ASCII character found in source file
+    let expected = Data(base64Encoded: "Ky0tLS0tKy0tLS0tKwp8IBtbMDszMW1mb28bWzA7MG0gfCAbWzA7MzRtYmFyG1swOzBtIHwKKy0tLS0tKy0tLS0tKwp8IBtbMDszMW0xICAbWzA7MG0gfCAbWzA7MzRtMiAgG1swOzBtIHwKKy0tLS0tKy0tLS0tKw==")
+      XCTAssertEqual(odata, expected)
+  }
+
+  func testRenderStyle() {
+    var table = fooTable()
+    table.style = .none
+    XCTAssertEqual(table.columnFence, " ")
+      let output = table.render()
+      let expected =  "                   \n" +
+                      "  foo   bar   baz  \n" +
+                      "                   \n" +
+                      "  1     2          \n" +
+                      "  11    22    33   \n" +
+                      "  111   222   333  \n" +
+                      "                   "
+      XCTAssertEqual(output, expected)
+
+    let table2 = fooTable(style: .none)
+    XCTAssertEqual(table2.render(), expected)
+  }
 
     func testRenderDefault() {
         let output = fooTable().render()

@@ -4,7 +4,7 @@
 //
 //  Created by Scott Hoyt on 2/3/16.
 //  Copyright © 2016 Scott Hoyt. All rights reserved.
-//
+//  Modified by ryh on 04/2022
 
 import Foundation
 
@@ -33,6 +33,9 @@ private extension String {
 }
 
 // MARK: - TextTable structures
+public enum TextTableStyle: Int {
+    case none = 0,`default`, dotted
+}
 
 /// Used to create a tabular representation of data.
 public struct TextTable {
@@ -49,6 +52,25 @@ public struct TextTable {
     /// The `String` used to mark the intersections of a `columnFence` and a `rowFence`. Defaults to "+".
     public var cornerFence = "+"
 
+  public var style = TextTableStyle.default{
+    didSet{
+      switch style {
+      case .default:
+        self.columnFence = "|"
+        self.rowFence = "-"
+        self.cornerFence = "+"
+      case .dotted:
+        self.columnFence = ":"
+        self.rowFence = "."
+        self.cornerFence = "."
+      case .none:
+        self.columnFence = " "
+        self.rowFence = " "
+        self.cornerFence = " "
+      }
+    }
+  }
+
     /// The table's header text. If set to `nil`, no header will be rendered. Defaults to `nil`.
     public var header: String?
 
@@ -64,6 +86,33 @@ public struct TextTable {
         self.header = header
     }
 
+  /**
+   Create a new `TextTable` from `TextTableColumn`s with Style.
+
+   - parameters:
+   - columns: An `Array` of `TextTableColumn`s.
+   - header: The table header. Defaults to `nil`.
+   */
+  public init(columns: [TextTableColumn],style:TextTableStyle = .default, header: String? = nil) {
+      self.columns = columns
+      self.header = header
+      self.style = style //didSet not work
+
+    switch style {
+    case .default:
+      self.columnFence = "|"
+      self.rowFence = "-"
+      self.cornerFence = "+"
+    case .dotted:
+      self.columnFence = ":"
+      self.rowFence = "."
+      self.cornerFence = "."
+    case .none:
+      self.columnFence = " "
+      self.rowFence = " "
+      self.cornerFence = " "
+    }
+  }
     /**
      Create a new `TextTable` from an `TextTableRepresentable`s.
 
@@ -134,12 +183,13 @@ public struct TextTable {
         let top = renderTableHeader() ?? separator
 
         let columnHeaders = fence(
-            strings: columns.map({ " \($0.header.withPadding(count: $0.width())) " }),
+          strings: columns.map({ " \($0.header.withPadding(count: $0.width()).withColor(color: $0.color)) " }),
             separator: columnFence
         )
 
-        let values = columns.isEmpty ? "" : (0..<columns.first!.values.count).map({ rowIndex in
-            fence(strings: columns.map({ " \($0.values[rowIndex].withPadding(count: $0.width(), alignment: $0.alignment)) " }), separator: columnFence)
+        let values = columns.isEmpty ? "" : (0..<columns.first!.values.count).map({
+          rowIndex in
+          fence(strings: columns.map({ " \($0.values[rowIndex].withPadding(count: $0.width(), alignment: $0.alignment).withColor(color: $0.color)) " }), separator: columnFence)
         }).paragraph()
 
         return [top, columnHeaders, separator, values, separator].paragraph()
@@ -174,6 +224,19 @@ public enum TextTableColumnAlignment: Int {
     case left = 0, center, right
 }
 
+/// Colors for Columns
+public enum ANSIColors: String,CaseIterable,Equatable {
+  case black = "\u{001B}[0;30m"
+  case red = "\u{001B}[0;31m"
+  case green = "\u{001B}[0;32m"
+  case yellow = "\u{001B}[0;33m"
+  case blue = "\u{001B}[0;34m"
+  case magenta = "\u{001B}[0;35m"
+  case cyan = "\u{001B}[0;36m"
+  case white = "\u{001B}[0;37m"
+  case reset = "\u{001B}[0;0m"
+}
+
 /// Represents a column in a `TextTable`.
 public struct TextTableColumn {
 
@@ -183,7 +246,9 @@ public struct TextTableColumn {
             computeWidth()
         }
     }
-    
+
+    public var color:ANSIColors = .reset
+
     public var alignment: TextTableColumnAlignment
 
     /// The values contained in this column. Each value represents another row.
@@ -200,6 +265,12 @@ public struct TextTableColumn {
         computeWidth()
     }
 
+  public init(header: String, alignment: TextTableColumnAlignment = .left, color:ANSIColors = .reset) {
+      self.header = header
+      self.alignment = alignment
+      self.color = color
+      computeWidth()
+  }
     /**
      The minimum width() of the column needed to accomodate all values in this column.
      - Complexity: O(1)
@@ -221,6 +292,7 @@ public struct TextTableColumn {
 
 }
 
+
 // MARK: - TextTableRepresentable
 
 /// A protocol used to create a `TextTable` from an object.
@@ -231,7 +303,7 @@ public protocol TextTableRepresentable {
 
     /// An array column headers to represent this object's data.
     static var columnHeaders: [String] { get }
-    
+
     static var columnAlignments: [TextTableColumnAlignment] { get }
 
     /// The values to render in the text table. Should have the same count as `columnHeaders`.
@@ -281,6 +353,11 @@ private extension String {
         }
         return self
     }
+
+  func withColor(color: ANSIColors) -> String {
+    if(color == ANSIColors.reset){return self}
+    return "\(color.rawValue)\(self)\(ANSIColors.reset.rawValue)"
+  }
 
     func strippedLength() -> Int {
 #if swift(>=3.2)
